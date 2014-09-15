@@ -1,6 +1,8 @@
 // Load the TCP Library
 net = require('net');
 
+var ruppells_sockets_local_port = process.env.RUPPELLS_SOCKETS_LOCAL_PORT || 5000;
+
 var fightDataList = [
     {
       id: 1, 
@@ -86,7 +88,7 @@ net.createServer(function (socket) {
     //console.log("User disconnected");
   });
  
-}).listen(5000);
+}).listen(ruppells_sockets_local_port);
 
 //Crossdomain issues
 net.createServer(function(socket) {
