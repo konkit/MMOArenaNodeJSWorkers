@@ -1,1 +1,2 @@
-web: node index.js
+
+socket: ./sockets-connect/rs-conn ./index.js tcp
