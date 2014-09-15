@@ -1,8 +1,5 @@
 // Load the TCP Library
 net = require('net');
- 
-// Keep track of the chat clients
-var clients = [];
 
 var fightDataList = [
     {
@@ -17,7 +14,7 @@ var fightDataList = [
         id: 2,  
         x: 0.0,
         y: 0.0,
-        z: 0.0      
+        z: 0.0  
       }
     },
 ];
@@ -56,30 +53,48 @@ var getPlayerAndEnemy = function(fightId, playerId, socket) {
 
 // Start a TCP Server
 net.createServer(function (socket) { 
+
   // Handle incoming messages from clients.
   socket.on('data', function (data) {
-    console.log("Received data : " + data)
-    dataObj = JSON.parse(data)
+    //console.log("Received data : " + data)
+    receivedDataObj = JSON.parse(data)
 
-    var fightId = dataObj.fightId
-    console.log("Fight id : " + fightId)
+    var fightId = receivedDataObj.fightId
+    //console.log("Fight id : " + fightId)
 
-    var playerId = dataObj.playerId
-    console.log("Player id : " + playerId)
+    var playerId = receivedDataObj.playerId
+    //console.log("Player id : " + playerId)
 
     var fightData = getPlayerAndEnemy(fightId, playerId, socket)
-    console.log("Fight data : " + fightData)
+    //console.log("Fight data : " + fightData)
 
     // set player properties
+    fightData.player.x = receivedDataObj.posX;
+    fightData.player.y = receivedDataObj.posY;
+    fightData.player.z = receivedDataObj.posZ;
 
     // respond with data
     socket.write( JSON.stringify(fightData) )
+
+    // current state debug : 
+    //console.log("Fight data list : " + JSON.stringify( fightDataList ) );
 
   });
  
   // On disconnect
   socket.on('end', function () {
-
+    //console.log("User disconnected");
   });
  
-}).listen(4567);
+}).listen(5000);
+
+//Crossdomain issues
+net.createServer(function(socket) {
+  var crossDomainXml = 
+    "<?xml version=\"1.0\"?>" + 
+    "<cross-domain-policy>" +
+    "  <allow-access-from domain=\"*\" to-ports=\"1-65536\"/>" +
+    "</cross-domain-policy>";
+
+  socket.write(crossDomainXml);
+}).listen(843);
