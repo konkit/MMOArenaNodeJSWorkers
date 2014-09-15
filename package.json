@@ -1,29 +1,17 @@
 {
-  "name": "node-js-getting-started",
-  "version": "0.1.0",
-  "description": "A sample Node.js app using Express 4",
-  "main": "index.js",
+  "name": "morning-sea-1024",
+  "version": "0.0.0",
+  "description": "Web and Socket chat server",
+  "main": "web.js",
   "scripts": {
-    "start": "node index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": "",
+  "author": "",
+  "license": "BSD",
   "dependencies": {
-    "express": "~3.4.x"
-  },
-  "engines": {
-    "node": "0.10.x"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/heroku/node-js-getting-started"
-  },
-  "keywords": [
-    "node",
-    "heroku",
-    "express"
-  ],
-  "author": "Mark Pundsack",
-  "contributors": [
-    "Zeke Sikelianos <zeke@sikelianos.com> (http://zeke.sikelianos.com)"
-  ],
-  "license": "MIT"
+    "express": "~3.4.7",
+    "jade": "~0.35.0",
+    "sockjs": "~0.3.8"
+  }
 }
