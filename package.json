@@ -1,7 +1,7 @@
 {
-  "name": "node-js-getting-started",
-  "version": "0.1.0",
-  "description": "A sample Node.js app using Express 4",
+  "name": "mmoarena-sockets",
+  "version": "0.0.1",
+  "description": "Socket program handling users fight",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -15,15 +15,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/heroku/node-js-getting-started"
-  },
-  "keywords": [
-    "node",
-    "heroku",
-    "express"
-  ],
-  "author": "Mark Pundsack",
-  "contributors": [
-    "Zeke Sikelianos <zeke@sikelianos.com> (http://zeke.sikelianos.com)"
-  ],
-  "license": "MIT"
+  }
 }

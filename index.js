@@ -86,7 +86,7 @@ net.createServer(function (socket) {
     //console.log("User disconnected");
   });
  
-}).listen(process.env.RUPPELLS_SOCKETS_LOCAL_PORT || 5000);
+}).listen(5000);
 
 //Crossdomain issues
 net.createServer(function(socket) {
@@ -97,4 +97,4 @@ net.createServer(function(socket) {
     "</cross-domain-policy>";
 
   socket.write(crossDomainXml);
-}).listen(process.env.RUPPELLS_SOCKETS_LOCAL_PORT || 843);
+}).listen(843);
