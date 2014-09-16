@@ -1,23 +1,64 @@
 // Load the TCP Library
 net = require('net');
 
+var backendExampleFightList = [
+  {
+    class: "pl.tenerowicz.mmoarena.Fight",
+    id: 22,
+    player1: {
+      class: "pl.tenerowicz.mmoarena.Character",
+      id: 14
+    },
+    player2: {
+      class: "pl.tenerowicz.mmoarena.Character",
+      id: 18
+    },
+    state: {
+      enumType: "pl.tenerowicz.mmoarena.fight.FightState",
+      name: "PREPARED"
+    },
+    winnerId: -1
+  },
+  {
+    class: "pl.tenerowicz.mmoarena.Fight",
+    id: 23,
+    player1: {
+      class: "pl.tenerowicz.mmoarena.Character",
+      id: 14
+    },
+    player2: {
+      class: "pl.tenerowicz.mmoarena.Character",
+      id: 18
+    },
+    state: {
+      enumType: "pl.tenerowicz.mmoarena.fight.FightState",
+      name: "PREPARED"
+    },
+    winnerId: -1
+  }
+]
+
+function FightInstance() {
+
+}
+
+function Player(playerId) {
+  this.id = playerId
+  this.x = 0.0,
+  this.y = 0.0,
+  this.z = 0.0,
+  this.yaw = 0.0
+}
+
+function Fight() {
+
+}
+
 var fightDataList = [
     {
       id: 1, 
-      player1: {
-        id: 1,
-        x: 0.0,
-        y: 0.0,
-        z: 0.0,
-        yaw: 0.0
-      }, 
-      player2: {
-        id: 2,  
-        x: 0.0,
-        y: 0.0,
-        z: 0.0,
-        yaw: 0.0 
-      }
+      player1: new Player(1), 
+      player2: new Player(2)
     },
 ];
 
