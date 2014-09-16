@@ -41,8 +41,6 @@ var backendExampleFightList = [
 
 
 function Player(backendData) {
-console.log("Player backendData : " + backendData + ", id : " + backendData.id);
-
   this.id = backendData.id
   this.x = 0.0
   this.y = 0.0
@@ -51,8 +49,6 @@ console.log("Player backendData : " + backendData + ", id : " + backendData.id);
 }
 
 function Fight(backendData) {
-  console.log("Fight backendData : " + backendData + ", id : " + backendData.id);
-
   this.id = backendData.id;
   this.player1 = new Player(backendData.player1);
   this.player2 = new Player(backendData.player2);
@@ -64,19 +60,10 @@ function FightContainer() {
   this.initWithBackendData = function(backendData) {
     fightList = []
 
-    console.log("Fight container backendData : " + backendData + ", id : " + backendData.id);
-
     backendData.forEach(function(fight) {
-      console.log("Fight id : " + fight.id)
-
       var fightObj = new Fight(fight)
-
-      console.log("FightObj : " + fightObj);
-
       fightList.push(fightObj)
     });
-
-    console.log("Fight list : " + JSON.stringify(fightList) );
   }
 
   this.getPlayerAndEnemy = function(fightId, playerId, socket) {
@@ -110,11 +97,23 @@ function FightContainer() {
 
     return {'player': player, 'enemy': enemy}
   }
+
+  this.actualizeData = function(dataFromPlayer, socket) {
+    var fightId = dataFromPlayer.fightId
+    var playerId = dataFromPlayer.playerId
+    var fightData = this.getPlayerAndEnemy(fightId, playerId, socket)
+
+    // actualize player properties with data sent from Unity
+    fightData.player.x = receivedDataObj.posX;
+    fightData.player.y = receivedDataObj.posY;
+    fightData.player.z = receivedDataObj.posZ;
+    fightData.player.yaw = receivedDataObj.yaw;
+
+    return JSON.stringify(fightData)
+  }
 }
 
-var fightContainer = new FightContainer()
-//fightContainer.fightList.push( new Fight(1, new Player(1), new Player(2) ))
-
+var fightContainer = new FightContainer();
 fightContainer.initWithBackendData(backendExampleFightList)
 
 // Start a TCP Server
@@ -124,22 +123,7 @@ net.createServer(function (socket) {
   socket.on('data', function (data) {   
     try {
       receivedDataObj = JSON.parse(data)
-
-      var fightId = receivedDataObj.fightId
-      var playerId = receivedDataObj.playerId
-      var fightData = fightContainer.getPlayerAndEnemy(fightId, playerId, socket)
-      //console.log("Fight data : " + fightData)
-
-      // set player properties
-      fightData.player.x = receivedDataObj.posX;
-      fightData.player.y = receivedDataObj.posY;
-      fightData.player.z = receivedDataObj.posZ;
-      fightData.player.yaw = receivedDataObj.yaw;
-
-      // respond with data
-      var response = JSON.stringify(fightData);
-      //console.log("Sending response : " + response)
-
+      var response = fightContainer.actualizeData(receivedDataObj, socket)
       socket.write( response )
     }catch(err) {
       console.log("Error occured : " + err)
@@ -149,7 +133,7 @@ net.createServer(function (socket) {
  
   // On disconnect
   socket.on('end', function () {
-    //console.log("User disconnected");
+
   });
  
 }).listen(5000);
