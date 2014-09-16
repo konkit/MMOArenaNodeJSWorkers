@@ -8,13 +8,15 @@ var fightDataList = [
         id: 1,
         x: 0.0,
         y: 0.0,
-        z: 0.0
+        z: 0.0,
+        yaw: 0.0
       }, 
       player2: {
         id: 2,  
         x: 0.0,
         y: 0.0,
-        z: 0.0  
+        z: 0.0,
+        yaw: 0.0 
       }
     },
 ];
@@ -72,9 +74,13 @@ net.createServer(function (socket) {
     fightData.player.x = receivedDataObj.posX;
     fightData.player.y = receivedDataObj.posY;
     fightData.player.z = receivedDataObj.posZ;
+    fightData.player.yaw = receivedDataObj.yaw;
 
     // respond with data
-    socket.write( JSON.stringify(fightData) )
+    var response = JSON.stringify(fightData);
+    console.log("Sending response : " + response)
+
+    socket.write( response )
 
     // current state debug : 
     //console.log("Fight data list : " + JSON.stringify( fightDataList ) );
