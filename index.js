@@ -38,94 +38,113 @@ var backendExampleFightList = [
   }
 ]
 
-function FightInstance() {
 
-}
 
-function Player(playerId) {
-  this.id = playerId
-  this.x = 0.0,
-  this.y = 0.0,
-  this.z = 0.0,
+function Player(backendData) {
+console.log("Player backendData : " + backendData + ", id : " + backendData.id);
+
+  this.id = backendData.id
+  this.x = 0.0
+  this.y = 0.0
+  this.z = 0.0
   this.yaw = 0.0
 }
 
-function Fight() {
+function Fight(backendData) {
+  console.log("Fight backendData : " + backendData + ", id : " + backendData.id);
 
+  this.id = backendData.id;
+  this.player1 = new Player(backendData.player1);
+  this.player2 = new Player(backendData.player2);
 }
 
-var fightDataList = [
-    {
-      id: 1, 
-      player1: new Player(1), 
-      player2: new Player(2)
-    },
-];
+function FightContainer() {
+  this.fightList = []
 
-var getPlayerAndEnemy = function(fightId, playerId, socket) {
-  var fight = null
+  this.initWithBackendData = function(backendData) {
+    fightList = []
 
-  fightDataList.forEach(function(entry) {
-      if(entry.id == fightId) {
-        fight = entry
-      }
-  });
+    console.log("Fight container backendData : " + backendData + ", id : " + backendData.id);
 
-  if( fight == "undefined") {
-    //exception
+    backendData.forEach(function(fight) {
+      console.log("Fight id : " + fight.id)
+
+      var fightObj = new Fight(fight)
+
+      console.log("FightObj : " + fightObj);
+
+      fightList.push(fightObj)
+    });
+
+    console.log("Fight list : " + JSON.stringify(fightList) );
   }
 
-  var player = null
-  var enemy = null
-  if( fight.player1.id == playerId ) {
-    player = fight.player1
-    enemy = fight.player2
-  } else if( fight.player2.id == playerId ) {
-    enemy = fight.player1
-    player = fight.player2
-  } else {
-    //exception
-  }
+  this.getPlayerAndEnemy = function(fightId, playerId, socket) {
+    var fight = null
 
-  if( player.socket == "undefined" ) {
-    player.socket = socket
-  }
+    fightList.forEach(function(entry) {
+        if(entry.id == fightId) {
+          fight = entry
+        }
+    });
 
-  return {'player': player, 'enemy': enemy}
+    if( fight == null || fight == "undefined") {
+      throw "Fight not found";
+    }
+
+    var player = null
+    var enemy = null
+    if( fight.player1.id == playerId ) {
+      player = fight.player1
+      enemy = fight.player2
+    } else if( fight.player2.id == playerId ) {
+      enemy = fight.player1
+      player = fight.player2
+    } else {
+      throw "Wrong fight for this player";
+    }
+
+    if( player.socket == "undefined" ) {
+      player.socket = socket
+    }
+
+    return {'player': player, 'enemy': enemy}
+  }
 }
+
+var fightContainer = new FightContainer()
+//fightContainer.fightList.push( new Fight(1, new Player(1), new Player(2) ))
+
+fightContainer.initWithBackendData(backendExampleFightList)
 
 // Start a TCP Server
 net.createServer(function (socket) { 
-
+  
   // Handle incoming messages from clients.
-  socket.on('data', function (data) {
-    //console.log("Received data : " + data)
-    receivedDataObj = JSON.parse(data)
+  socket.on('data', function (data) {   
+    try {
+      receivedDataObj = JSON.parse(data)
 
-    var fightId = receivedDataObj.fightId
-    //console.log("Fight id : " + fightId)
+      var fightId = receivedDataObj.fightId
+      var playerId = receivedDataObj.playerId
+      var fightData = fightContainer.getPlayerAndEnemy(fightId, playerId, socket)
+      //console.log("Fight data : " + fightData)
 
-    var playerId = receivedDataObj.playerId
-    //console.log("Player id : " + playerId)
+      // set player properties
+      fightData.player.x = receivedDataObj.posX;
+      fightData.player.y = receivedDataObj.posY;
+      fightData.player.z = receivedDataObj.posZ;
+      fightData.player.yaw = receivedDataObj.yaw;
 
-    var fightData = getPlayerAndEnemy(fightId, playerId, socket)
-    //console.log("Fight data : " + fightData)
+      // respond with data
+      var response = JSON.stringify(fightData);
+      //console.log("Sending response : " + response)
 
-    // set player properties
-    fightData.player.x = receivedDataObj.posX;
-    fightData.player.y = receivedDataObj.posY;
-    fightData.player.z = receivedDataObj.posZ;
-    fightData.player.yaw = receivedDataObj.yaw;
-
-    // respond with data
-    var response = JSON.stringify(fightData);
-    console.log("Sending response : " + response)
-
-    socket.write( response )
-
-    // current state debug : 
-    //console.log("Fight data list : " + JSON.stringify( fightDataList ) );
-
+      socket.write( response )
+    }catch(err) {
+      console.log("Error occured : " + err)
+      socket.write("ERROR : " + err)
+    }
   });
  
   // On disconnect
