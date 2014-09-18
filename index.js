@@ -1,44 +1,7 @@
 // Load the TCP Library
-net = require('net');
-
-var backendExampleFightList = [
-  {
-    class: "pl.tenerowicz.mmoarena.Fight",
-    id: 22,
-    player1: {
-      class: "pl.tenerowicz.mmoarena.Character",
-      id: 14
-    },
-    player2: {
-      class: "pl.tenerowicz.mmoarena.Character",
-      id: 18
-    },
-    state: {
-      enumType: "pl.tenerowicz.mmoarena.fight.FightState",
-      name: "PREPARED"
-    },
-    winnerId: -1
-  },
-  {
-    class: "pl.tenerowicz.mmoarena.Fight",
-    id: 23,
-    player1: {
-      class: "pl.tenerowicz.mmoarena.Character",
-      id: 14
-    },
-    player2: {
-      class: "pl.tenerowicz.mmoarena.Character",
-      id: 18
-    },
-    state: {
-      enumType: "pl.tenerowicz.mmoarena.fight.FightState",
-      name: "PREPARED"
-    },
-    winnerId: -1
-  }
-]
-
-
+var net = require('net');
+var http = require('http');
+var request = require('request');
 
 function Player(backendData) {
   this.id = backendData.id
@@ -113,8 +76,23 @@ function FightContainer() {
   }
 }
 
+
+
 var fightContainer = new FightContainer();
-fightContainer.initWithBackendData(backendExampleFightList)
+
+// HTTP request
+var http_request_interval = 1 * 1000;
+setInterval( function() { 
+  getNodeDataFromBackend(); 
+}, http_request_interval );
+
+function getNodeDataFromBackend() {
+  request('http://107.155.108.250:8888/GrailsMMOArena-0.1/fight/requestNodeData', function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      fightContainer.initWithBackendData( JSON.parse( body ) );
+    }
+  })
+}
 
 // Start a TCP Server
 net.createServer(function (socket) { 
@@ -148,3 +126,4 @@ net.createServer(function(socket) {
 
   socket.write(crossDomainXml);
 }).listen(843);
+
