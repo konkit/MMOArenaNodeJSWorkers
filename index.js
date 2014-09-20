@@ -3,36 +3,30 @@ var net = require('net');
 var http = require('http');
 var request = require('request');
 
-function Player(backendData) {
-  this.id = backendData.id
-  this.x = 0.0
-  this.y = 0.0
-  this.z = 0.0
-  this.yaw = 0.0
+var fightData = undefined;
+
+var decoratePlayer = function(player) {
+  player.x = 0.0;
+  player.y = 0.0;
+  player.z = 0.0;
+  player.yaw = 0.0;
+
+  delete player.class
 }
 
-function Fight(backendData) {
-  this.id = backendData.id;
-  this.player1 = new Player(backendData.player1);
-  this.player2 = new Player(backendData.player2);
-}
+var decorateFightData = function(backendData) {
+  for(i=0; i<backendData.length; i++) {
+    decoratePlayer(backendData[i].player1);
+    decoratePlayer(backendData[i].player2);
 
-function FightContainer() {
-  this.fightList = []
-
-  this.initWithBackendData = function(backendData) {
-    fightList = []
-
-    backendData.forEach(function(fight) {
-      var fightObj = new Fight(fight)
-      fightList.push(fightObj)
-    });
+    delete backendData[i].class
+    delete backendData[i].state.enumType
   }
 
-  this.getPlayerAndEnemy = function(fightId, playerId, socket) {
+  backendData.getPlayerAndEnemy = function(fightId, playerId, socket) {
     var fight = null
 
-    fightList.forEach(function(entry) {
+    this.forEach(function(entry) {
         if(entry.id == fightId) {
           fight = entry
         }
@@ -61,35 +55,32 @@ function FightContainer() {
     return {'player': player, 'enemy': enemy}
   }
 
-  this.actualizeData = function(dataFromPlayer, socket) {
+  backendData.actualizeData = function(dataFromPlayer, socket) {
     var fightId = dataFromPlayer.fightId
     var playerId = dataFromPlayer.playerId
-    var fightData = this.getPlayerAndEnemy(fightId, playerId, socket)
+    var cntFightResponse = this.getPlayerAndEnemy(fightId, playerId, socket)
 
     // actualize player properties with data sent from Unity
-    fightData.player.x = receivedDataObj.posX;
-    fightData.player.y = receivedDataObj.posY;
-    fightData.player.z = receivedDataObj.posZ;
-    fightData.player.yaw = receivedDataObj.yaw;
+    cntFightResponse.player.x = receivedDataObj.posX;
+    cntFightResponse.player.y = receivedDataObj.posY;
+    cntFightResponse.player.z = receivedDataObj.posZ;
+    cntFightResponse.player.yaw = receivedDataObj.yaw;
 
-    return JSON.stringify(fightData)
+    return JSON.stringify(cntFightResponse)
   }
 }
 
-
-
-var fightContainer = new FightContainer();
-
 // HTTP request
-var http_request_interval = 1 * 1000;
-setInterval( function() { 
-  getNodeDataFromBackend(); 
-}, http_request_interval );
+var http_request_interval = 3 * 1000;
+setInterval( function() { getNodeDataFromBackend() }, http_request_interval );
 
 function getNodeDataFromBackend() {
-  request('http://107.155.108.250:8888/GrailsMMOArena-0.1/fight/requestNodeData', function (error, response, body) {
+  request('http://localhost:8080/GrailsMMOArena/fight/requestNodeData', function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      fightContainer.initWithBackendData( JSON.parse( body ) );
+      fightData = JSON.parse(body)
+      decorateFightData( fightData );
+
+      console.log("HTTP data received");
     }
   })
 }
@@ -101,11 +92,19 @@ net.createServer(function (socket) {
   socket.on('data', function (data) {   
     try {
       receivedDataObj = JSON.parse(data)
-      var response = fightContainer.actualizeData(receivedDataObj, socket)
+      //var response = fightContainer.actualizeData(receivedDataObj, socket)
+      var response = fightData.actualizeData(receivedDataObj, socket);
+      response = response.length + '#' + response;
+
+      console.log("RESPONSE : " + response);
+
       socket.write( response )
     }catch(err) {
       console.log("Error occured : " + err)
-      socket.write("ERROR : " + err)
+
+      var response = "ERROR occured : " + err;
+      response = response.length + '#' + response;
+      socket.write(response)
     }
   });
  
