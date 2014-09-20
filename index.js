@@ -75,7 +75,7 @@ var http_request_interval = 3 * 1000;
 setInterval( function() { getNodeDataFromBackend() }, http_request_interval );
 
 function getNodeDataFromBackend() {
-  request('http://localhost:8080/GrailsMMOArena/fight/requestNodeData', function (error, response, body) {
+  request('http://107.155.108.250:8888/GrailsMMOArena-0.1/fight/requestNodeData', function (error, response, body) {
     if (!error && response.statusCode == 200) {
       fightData = JSON.parse(body)
       decorateFightData( fightData );
