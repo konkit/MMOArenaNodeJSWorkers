@@ -96,8 +96,6 @@ net.createServer(function (socket) {
       var response = fightData.actualizeData(receivedDataObj, socket);
       response = response.length + '#' + response;
 
-      console.log("RESPONSE : " + response);
-
       socket.write( response )
     }catch(err) {
       console.log("Error occured : " + err)
