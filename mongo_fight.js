@@ -8,25 +8,9 @@ mongoose.connect('mongodb://127.0.0.1:27017/mmoarena_db');
 
 var db = mongoose.connection;
 
-var fightSchema_OLD = mongoose.Schema({
-    _id: Number,
-    player1: {
-        playerId: Number,
-        x: Number,
-        y: Number,
-        z: Number
-    },
-    player2: {
-        playerId: Number,
-        x: Number,
-        y: Number,
-        z: Number
-    },
-    state: String
-})
-
 var characterSchema = mongoose.Schema({
     characterId: Number,
+    hp: Number,
     x: Number,
     y: Number,
     z: Number
@@ -82,16 +66,6 @@ net.createServer(function (socket) {
                 player.y = receivedDataObj.newY;
                 player.z = receivedDataObj.newZ;
                 player.yaw = receivedDataObj.yaw;
-
-                console.log("Fight instance after edit : " + fightInstance)
-
-//                fightInstance.save( function(error, data){
-//                    if( error ){
-//                        throw error
-//                    }
-//
-//                    response = JSON.stringify(fightInstance)
-//                });
 
                 var updateQuery = {"_id": fightId};
                 Fight.findOneAndUpdate(updateQuery, { $set: fightInstance})
