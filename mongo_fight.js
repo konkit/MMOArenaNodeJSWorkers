@@ -40,6 +40,8 @@ net.createServer(function (socket) {
         try {
             receivedDataObj = JSON.parse(data)
 
+            console.log("! Recv data : " + data)
+
             // get fight id and player id from input data from Unity client
             var fightId = receivedDataObj.fightId
             var playerId = receivedDataObj.playerId
@@ -47,7 +49,7 @@ net.createServer(function (socket) {
             var response = null
 
             // fetch fight with given id from MongoDB
-            Fight.findOne({"_id": fightId}, function (err, fightInstance) {
+            Fight.findOne({"fightId": fightId}, function (err, fightInstance) {
                 if (err) throw err;
 
                 console.log("Fight instance : " + fightInstance)
@@ -67,6 +69,9 @@ net.createServer(function (socket) {
                     response = "WAITING "
                 } else {
                     //TODO: determine which player is "player", which is "enemy"
+                    console.log("player1 characterId = " + fightInstance.player1[0].characterId)
+                    console.log("player2 characterId = " + fightInstance.player2[0].characterId)
+
                     if( fightInstance.player1[0].characterId == playerId) {
                         player = fightInstance.player1[0]
                         enemy = fightInstance.player2[0]
@@ -75,12 +80,17 @@ net.createServer(function (socket) {
                         enemy = fightInstance.player1[0]
                     }
 
+                    console.log("Player : " + player + ", enemy : " + enemy)
+                    console.log("Received data obj : " + JSON.stringify(receivedDataObj) )
+
                     //TODO: actualize player data in DB
-                    player.x = receivedDataObj.newX;
-                    player.y = receivedDataObj.newY;
-                    player.z = receivedDataObj.newZ;
+                    player.x = receivedDataObj.posX;
+                    player.y = receivedDataObj.posY;
+                    player.z = receivedDataObj.posZ;
                     player.yaw = receivedDataObj.yaw;
                     player.hp = receivedDataObj.hp;
+
+                    console.log("Actualized player : " + player)
 
                     var updateQuery = {"_id": fightId};
                     Fight.findOneAndUpdate(updateQuery, { $set: fightInstance})
