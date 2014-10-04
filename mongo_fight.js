@@ -10,11 +10,12 @@ var db = mongoose.connection;
 
 var characterSchema = mongoose.Schema({
     characterId: Number,
+    yaw: Number,
     hp: Number,
     x: Number,
     y: Number,
     z: Number
-});
+}, { collection: 'mongoCharacter' });
 
 var fightSchema = mongoose.Schema({
     _id: Number,
@@ -73,27 +74,35 @@ net.createServer(function (socket) {
                     console.log("player2 characterId = " + fightInstance.player2[0].characterId)
 
                     if( fightInstance.player1[0].characterId == playerId) {
-                        player = fightInstance.player1[0]
-                        enemy = fightInstance.player2[0]
+                        //TODO: actualize player data in DB
+                        player = fightInstance.player1[0];
+                        enemy = fightInstance.player2[0];
+
+                        fightInstance.player1[0].x = receivedDataObj.posX;
+                        fightInstance.player1[0].y = receivedDataObj.posY;
+                        fightInstance.player1[0].z = receivedDataObj.posZ;
+                        fightInstance.player1[0].yaw = receivedDataObj.yaw;
+                        fightInstance.player1[0].hp = receivedDataObj.hp;
+
+                        fightInstance.markModified('player1')
+
+                        fightInstance.save(function(err){ })
+
                     } else if( fightInstance.player2[0].characterId == playerId )  {
-                        player = fightInstance.player2[0]
-                        enemy = fightInstance.player1[0]
+                        var player = fightInstance.player2[0];
+                        var enemy = fightInstance.player1[0];
+
+                        //TODO: actualize player data in DB
+                        fightInstance.player2[0].x = receivedDataObj.posX;
+                        fightInstance.player2[0].y = receivedDataObj.posY;
+                        fightInstance.player2[0].z = receivedDataObj.posZ;
+                        fightInstance.player2[0].yaw = receivedDataObj.yaw;
+                        fightInstance.player2[0].hp = receivedDataObj.hp;
+
+                        fightInstance.markModified('player2')
+
+                        fightInstance.save(function(err){ })
                     }
-
-                    console.log("Player : " + player + ", enemy : " + enemy)
-                    console.log("Received data obj : " + JSON.stringify(receivedDataObj) )
-
-                    //TODO: actualize player data in DB
-                    player.x = receivedDataObj.posX;
-                    player.y = receivedDataObj.posY;
-                    player.z = receivedDataObj.posZ;
-                    player.yaw = receivedDataObj.yaw;
-                    player.hp = receivedDataObj.hp;
-
-                    console.log("Actualized player : " + player)
-
-                    var updateQuery = {"_id": fightId};
-                    Fight.findOneAndUpdate(updateQuery, { $set: fightInstance})
 
                     //TODO: if player or enemy hp is <= 0 then fight is finished
                     if( 1 == 3 ) {
