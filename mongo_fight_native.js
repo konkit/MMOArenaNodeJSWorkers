@@ -82,9 +82,7 @@ mongoClient.connect('mongodb://localhost/mmoarena_db', function(err, db){
                             console.log("Generating response from fightInstance")
 
                             // Generate response for Unity3D client
-                            var responseArr = [
-                                {player: player, enemy: enemy}
-                            ]
+                            var responseArr = {player: player, enemy: enemy}
 
                             response = JSON.stringify(responseArr)
                         }
