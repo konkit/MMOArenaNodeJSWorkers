@@ -49,6 +49,18 @@ mongoClient.connect('mongodb://localhost/mmoarena_db', function(err, db) {
         res.send( "OK" + ", " + date)
     });
 
+    app.get('/crossdomain.xml', function(req, res) {
+        var crossDomainXml =
+        "<?xml version=\"1.0\"?>" +
+        "<cross-domain-policy>" +
+        "  <allow-access-from domain=\"*\" to-ports=\"1-65536\"/>" +
+        "</cross-domain-policy>";
+
+        res.send( crossDomainXml )
+    });
+
+
+
     app.listen(5000);
     console.log('Listening on port 5000...');
 
