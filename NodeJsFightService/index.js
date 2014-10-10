@@ -59,7 +59,12 @@ mongoClient.connect('mongodb://localhost/mmoarena_db', function(err, db) {
         res.send( crossDomainXml )
     });
 
+    app.get('/hc', function(req, res) {
+        var date = new Date();
+        var current_hour = date.getHours();
 
+        res.send( "OK" + ", " + date)
+    });
 
     app.listen(5000);
     console.log('Listening on port 5000...');
