@@ -8,8 +8,7 @@ var mongo = require('mongodb');
 var BSON = require("bson")
 
 mongoClient.connect('mongodb://localhost/mmoarena_db', function(err, db) {
-    if (err)
-        throw err;
+    if (err) throw err;
 
     console.log("Connected to MongoDB");
 
@@ -25,10 +24,6 @@ mongoClient.connect('mongodb://localhost/mmoarena_db', function(err, db) {
             },
             function(err, result) {
                 if(err) throw err;
-
-                console.log(result[0])
-                console.log(result[0]._id)
-
                 res.send({playerId: req.params.playerId, requestId: result[0]._id});
             }
         );
@@ -97,7 +92,7 @@ mongoClient.connect('mongodb://localhost/mmoarena_db', function(err, db) {
                             {
                                 $set: {
                                     fightId : fightId,
-                                    fightState: "SCHEDULED"
+                                    fightState: "PREPARED"
                                 }
                             },
                             { multi: true },

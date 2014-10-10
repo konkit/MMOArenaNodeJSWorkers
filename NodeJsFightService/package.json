@@ -10,7 +10,8 @@
     "amqp": "*",
     "express": "*",
     "mongodb": "*",
-    "bson": "*"
+    "bson": "*",
+    "js2xmlparser": "*"
   },
   "engines": {
     "node": "0.10.x"
