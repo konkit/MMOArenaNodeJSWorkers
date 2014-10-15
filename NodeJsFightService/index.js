@@ -108,18 +108,31 @@ mongoClient.connect('mongodb://localhost/mmoarena_db', function(err, db) {
 
                         collection.update(
                             {
-                                $or:[
-                                    {_id: docs1[0]._id},
-                                    {_id: docs1[1]._id}
-                                ]
+                                _id: docs1[0]._id
                             },
                             {
                                 $set: {
                                     fightId : fightId,
-                                    fightState: "PREPARED"
+                                    fightState: "PREPARED",
+                                    enemyId: docs1[1].playerId
                                 }
                             },
-                            { multi: true },
+                            function(err, result) {
+
+                            }
+                        );
+
+                        collection.update(
+                            {
+                                _id: docs1[1]._id
+                            },
+                            {
+                                $set: {
+                                    fightId : fightId,
+                                    fightState: "PREPARED",
+                                    enemyId: docs1[0].playerId
+                                }
+                            },
                             function(err, result) {
 
                             }
