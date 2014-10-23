@@ -11,7 +11,8 @@
     "express": "*",
     "mongodb": "*",
     "bson": "*",
-    "js2xmlparser": "*"
+    "js2xmlparser": "*",
+    "sockjs": "*"
   },
   "engines": {
     "node": "0.10.x"
