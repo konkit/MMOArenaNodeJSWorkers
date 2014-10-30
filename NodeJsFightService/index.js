@@ -160,7 +160,7 @@ var chat = sockjs.createServer();
 chat.on('connection', function (conn) {
     connections.push(conn);
     var number = connections.length;
-    //conn.write("Welcome, User " + number);
+    conn.write("Connected to chat");
     conn.on('data', function (message) {
         for (var ii=0; ii < connections.length; ii++) {
             connections[ii].write(message);
