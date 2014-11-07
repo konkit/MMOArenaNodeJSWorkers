@@ -4,6 +4,7 @@ module.exports = function(db) {
 
         collection.count({fightState: "PENDING"}, function (err, count) {
             if (err) { throw err; }
+            
             if (count < 2) {
                 console.log("No pending fight requests");
                 return;
@@ -12,9 +13,7 @@ module.exports = function(db) {
             collection.find({fightState: "PENDING"}, {limit: 2}).toArray(function (err, docs1) {
                 if (err) { throw err; }
 
-                console.log("Found fight between " + JSON.stringify(docs1[0]) + " and " + JSON.stringify(docs1[1]) );
-
-                if ((!docs1[0]._id || !docs1[1]._id)) {
+                if ( !docs1[0]._id || !docs1[1]._id ) {
                     console.log("One of the fightRequest object is null");
                     return;
                 }

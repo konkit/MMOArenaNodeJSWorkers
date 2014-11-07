@@ -11,7 +11,6 @@ mongoClient.connect('mongodb://localhost/mmoarena_db', function (err, db) {
     console.log("Connected to MongoDB");
 
     var app = express();
-
     app.get('/requestFight/:playerId', function (req, res) {
         var collection = db.collection('fightRequests');
         collection.insert(
@@ -22,9 +21,7 @@ mongoClient.connect('mongodb://localhost/mmoarena_db', function (err, db) {
             },
             function (err, result) {
                 if (err) { throw err; }
-                /*jslint nomen: true*/
                 res.send({playerId: req.params.playerId, requestId: result[0]._id});
-                /*jslint nomen: false*/
             }
         );
     });
@@ -57,13 +54,6 @@ mongoClient.connect('mongodb://localhost/mmoarena_db', function (err, db) {
             "</cross-domain-policy>";
 
         res.send(crossDomainXml);
-    });
-
-    app.get('/hc', function (req, res) {
-        var date = new Date();
-        var current_hour = date.getHours();
-
-        res.send("OK" + ", " + date);
     });
 
     app.listen(5000);
