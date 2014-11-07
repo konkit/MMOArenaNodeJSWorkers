@@ -1,5 +1,3 @@
-/*jslint node:true*/
-
 var express = require('express');
 
 var mongoClient = require('mongodb').MongoClient;
@@ -71,109 +69,7 @@ mongoClient.connect('mongodb://localhost/mmoarena_db', function (err, db) {
     app.listen(5000);
     console.log('Listening on port 5000...');
 
-
-    setInterval(function () {
-        var collection = db.collection('fightRequests');
-
-        collection.count({fightState: "PENDING"}, function (err, count) {
-            if (err) { throw err; }
-            if (count < 2) {
-                console.log("No pending fight requests");
-                return;
-            }
-
-            collection.find({fightState: "PENDING"}, {limit: 2}).toArray(function (err, docs1) {
-                if (err) { throw err; }
-
-                console.log("Found fight between ");
-                console.log(JSON.stringify(docs1[0]));
-                console.log(" and ");
-                console.log(JSON.stringify(docs1[1]));
-
-                if ((!docs1[0]._id || !docs1[1]._id)) {
-                    console.log("One of the fightRequest object is null");
-                    return;
-                }
-
-                var fightCollections = db.collection('fights');
-                fightCollections.insert(
-                    {
-                        player1: docs1[0].playerId,
-                        player2: docs1[1].playerId
-                    },
-                    function(err, result) {
-                        if( err ) throw err;
-
-                        console.log( "CREATED FIGHT : " + JSON.stringify(result));
-
-                        /*jslint nomen: true*/
-                        var fightId = result[0]._id;
-                        /*jslint nomen: false*/
-
-                        collection.update(
-                            {
-                                _id: docs1[0]._id
-                            },
-                            {
-                                $set: {
-                                    fightId : fightId,
-                                    fightState: "PREPARED",
-                                    enemyId: docs1[1].playerId
-                                }
-                            },
-                            function(err, result) {
-
-                            }
-                        );
-
-                        collection.update(
-                            {
-                                _id: docs1[1]._id
-                            },
-                            {
-                                $set: {
-                                    fightId : fightId,
-                                    fightState: "PREPARED",
-                                    enemyId: docs1[0].playerId
-                                }
-                            },
-                            function(err, result) {
-
-                            }
-                        );
-                    }
-                );
-            });
-        });
-
-    }, 2000)
+    require('./matchmaker.js')(db);
 });
 
-
-// chat service
-var http = require('http');
-var sockjs = require('sockjs');
-
-var connections = [];
-
-var chat = sockjs.createServer();
-chat.on('connection', function (conn) {
-    connections.push(conn);
-    var number = connections.length;
-    conn.write("Connected to chat");
-    conn.on('data', function (message) {
-        for (var ii=0; ii < connections.length; ii++) {
-            connections[ii].write(message);
-        }
-    });
-    conn.on('close', function() {
-        for (var ii=0; ii < connections.length; ii++) {
-            //connections[ii].write("User " + number + " has disconnected");
-        }
-    });
-});
-
-var server = http.createServer();
-chat.installHandlers(server, {prefix:'/chat'});
-server.listen(9999, '0.0.0.0');
-
+require('./websocket_chat.js');
