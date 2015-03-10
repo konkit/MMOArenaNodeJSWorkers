@@ -1,0 +1,55 @@
+<html>
+	<head>
+		<style>
+			#js-status {
+				width: 550px; 
+				height: 250px;
+			}
+		</style>
+	</head>
+	
+	<body>
+		<p><textarea id="js-status"></textarea></p>
+		<p>Player Id: <input class="playerId" type="text" />
+		<p><button id="js-init-request">Init</button></p>
+
+		<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+		<script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
+		
+		<script type="text/javascript">
+			var requestId;
+			var fightId;
+
+			$('#js-init-request').click( function() {
+				var playerId = $('.playerId').val();
+				requestFight(playerId);
+			});
+
+			var socket = io();
+			socket.on('message', function(data){
+			    console.log(data.message);
+			});
+
+			socket.on('requestCreated', function(data) {
+				$('#js-status').append('Request created, id: ' + data.requestId + '\n');
+			})
+
+			socket.on('fightFound', function(data) {
+				$('#js-status').append('Fight found: ' + JSON.stringify(data) + '\n' );
+			})
+
+			function requestFight(playerId) {
+				socket.emit('fightRequest', {'playerId': playerId});
+			}
+
+
+
+
+
+
+
+				
+		</script>
+	</body>
+	
+</html>

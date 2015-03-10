@@ -6,12 +6,13 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "request": "*",
     "amqp": "*",
-    "express": "*",
-    "mongodb": "*",
     "bson": "*",
+    "express": "*",
     "js2xmlparser": "*",
+    "mongodb": "*",
+    "request": "*",
+    "socket.io": "^1.3.5",
     "sockjs": "*"
   },
   "engines": {
