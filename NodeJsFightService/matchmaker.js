@@ -6,7 +6,7 @@ module.exports = function(db) {
             if (err) { throw err; }
             
             if (count < 2) {
-                console.log("No pending fight requests");
+                //console.log("No pending fight requests");
                 return;
             }
 

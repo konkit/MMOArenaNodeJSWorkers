@@ -39,13 +39,16 @@ mongoClient.connect('mongodb://localhost/mmoarena_db', function (err, db) {
 
         var fightRequestId = -1;
         var fightId = -1;
+        var playerId = -1;
 
         var fightRequestCheckInterval = -1;
 
         socket.on('fightRequest', function(data){
+            playerId = data.playerId;
+
             requestCollection.insert(
                 {
-                    playerId: data.playerId,
+                    playerId: playerId,
                     fightState: "PENDING",
                     fightId: -1
                 },
@@ -80,9 +83,15 @@ mongoClient.connect('mongodb://localhost/mmoarena_db', function (err, db) {
                         }
 
                         fightId = fights[0]._id;
+                        var enemyId = -1;
+                        if( fights[0].player1 === playerId) {
+                            enemyId = fights[0].player2
+                        } else {
+                            enemyId = fights[0].player1
+                        }
 
                         clearInterval(fightRequestCheckInterval);
-                        socket.emit('fightFound', fights[0])
+                        socket.emit('fightFound', {'roomId': fightId, 'playerId': playerId, 'enemyId': enemyId} )
                     });
                 }
                 
